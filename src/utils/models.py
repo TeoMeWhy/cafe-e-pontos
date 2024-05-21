@@ -1,14 +1,18 @@
 from datetime import datetime
-from sqlalchemy.orm import Mapped, registry, mapped_column
+
 from sqlalchemy import func
+from sqlalchemy.orm import Mapped, mapped_column, registry
 
 table_registry = registry()
+
 
 @table_registry.mapped_as_dataclass
 class Customer:
     __tablename__ = 'customers'
 
-    id: Mapped[int] = mapped_column(init=False, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        init=False, primary_key=True, autoincrement=True
+    )
     name: Mapped[str] = mapped_column(nullable=False)
     lastname: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
