@@ -1,6 +1,7 @@
 from nicegui import APIRouter, ui
 
-from utils import models, db, validate
+from models.product import Product
+from utils import db, validate
 
 from sqlalchemy import exc
 
@@ -47,7 +48,7 @@ def new_product_page():
             ui.notification("Preencha todos os campos corretamente.", color='red')
             return
 
-        product = models.Product(
+        product = Product(
             name = name.value,
             description = description.value,
             value = value.value,

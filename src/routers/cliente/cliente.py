@@ -3,7 +3,7 @@ from nicegui import APIRouter, ui
 from sqlalchemy import select
 
 from utils import db
-from utils import models
+from models.customer import Customer
 
 cliente = APIRouter()
 session = db.new_session()
@@ -11,11 +11,50 @@ session = db.new_session()
 @cliente.page('/cliente/{document}')
 def customer_page(document: str):
 
+    async def delete_customer():
+        result = await dialog
+        if result == "Sim":
+            try:
+                session.delete(customer)
+                ui.notification("Voce excluiu o usuário com sucesso!")
+                session.commit()
+            except Exception as err:
+                session.rollback()
+                print(err)
+                ui.notification("Não foi possível excluir o usuário", color='red')
+
+    def update_customer():
+
+        mandatory_values = [
+            name.value,
+            lastname.value,
+            email.value,
+            birthday.value,
+            document_id.value
+        ]
+
+        if '' in mandatory_values:
+            ui.notify("Entre com os dados necessários", color='red')
+            return
+
+        customer.name = name.value
+        customer.lastname = lastname.value
+        customer.date = birthday.value
+        customer.document = document_id.value
+        customer.email = email.value
+        customer.phone1 = phone1.value
+        customer.phone2 = phone2.value
+        customer.instagram = instagram.value
+        customer.points = points.value
+        session.commit()
+        ui.notification("Usuário Salvo com sucesso!", color='green')
+
+
     ui.markdown("#Cliente")
-    customer = session.scalar(select(models.Customer)
-                              .where(models.Customer.document==document))
+    customer = session.scalar(select(Customer)
+                              .where(Customer.document==document))
     if not customer:
-        ui.navigate.to("/cliente_busca?error=true")
+        ui.navigate.to("/busca_cliente?error=true")
         return
 
     else:
@@ -80,7 +119,10 @@ def customer_page(document: str):
                       value=customer.points)
 
     with ui.row():
-        ui.button("Resgatar pontos", on_click=lambda: ui.notification("Pontos resgatados"))
+        ui.button("Salvar", on_click=update_customer, color='green')
+        ui.button("Excluir", on_click=delete_customer, color='red')
+        
+    with ui.row():
         ui.button("Compras", on_click=lambda: ui.notification("Página de compras ainda não foi implementada"))
         ui.button("Estatísticas", on_click=lambda: ui.notification("Página de estatísticas ainda não foi implementada"))
 
@@ -90,48 +132,6 @@ def customer_page(document: str):
             ui.button('Sim', on_click=lambda: dialog.submit('Sim'))
             ui.button('Não', on_click=lambda: dialog.submit('Não'))
 
-    async def delete_customer():
-        result = await dialog
-        if result == "Sim":
-            try:
-                session.delete(customer)
-                ui.notification("Voce excluiu o usuário com sucesso!")
-                session.commit()
-            except Exception as err:
-                session.rollback()
-                print(err)
-                ui.notification("Não foi possível excluir o usuário", color='red')
-
-    def update_customer():
-
-        mandatory_values = [
-            name.value,
-            lastname.value,
-            email.value,
-            birthday.value,
-            document_id.value
-        ]
-
-        if '' in mandatory_values:
-            ui.notify("Entre com os dados necessários", color='red')
-            return
-
-        customer.name = name.value
-        customer.lastname = lastname.value
-        customer.date = birthday.value
-        customer.document = document_id.value
-        customer.email = email.value
-        customer.phone1 = phone1.value
-        customer.phone2 = phone2.value
-        customer.instagram = instagram.value
-        customer.points = points.value
-        session.commit()
-        ui.notification("Usuário Salvo com sucesso!", color='green')
-
     with ui.row():
-        ui.button("Salvar", on_click=update_customer, color='green')
-        ui.button("Excluir", on_click=delete_customer, color='red')
-    
-    with ui.row():
-        ui.button("Voltar", on_click=lambda: ui.navigate.to('/cliente_busca'))
+        ui.button("Voltar", on_click=lambda: ui.navigate.to('/busca_cliente'))
         ui.button("Início", on_click=lambda: ui.navigate.to('/'))

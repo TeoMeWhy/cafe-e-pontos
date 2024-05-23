@@ -1,6 +1,7 @@
 from nicegui import APIRouter, ui
 
-from utils import db, models
+from models.product import Product
+from utils import db
 
 from sqlalchemy import select
 
@@ -16,7 +17,7 @@ def search_product_page(error=None):
 
     ui.markdown('# Buscar Produto')
 
-    products = session.execute(select(models.Product.id, models.Product.name)).all()
+    products = session.execute(select(Product.id, Product.name)).all()
     descriptions = [f'{i[0]:02} - {i[-1]}' for i in products]
     description = ui.select(descriptions, with_input=True)
 

@@ -3,7 +3,8 @@ import datetime
 from nicegui import APIRouter, ui
 from sqlalchemy import exc
 
-from utils import db, models
+from models.customer import Customer
+from utils import db
 
 session = db.new_session()
 cadastro = APIRouter()
@@ -70,14 +71,14 @@ def new_customer_page():
             ui.notify("Entre com os dados necessários", color='red')
             return
 
-        customer = models.Customer(name=name.value,
-                                    lastname=lastname.value,
-                                    email=email.value,
-                                    date=datetime.datetime.strptime(birthday.value, "%Y-%m-%d"),
-                                    document=document_id.value,
-                                    phone1=phone1.value,
-                                    phone2=phone2.value,
-                                    instagram=instagram.value)
+        customer = Customer(name=name.value,
+                            lastname=lastname.value,
+                            email=email.value,
+                            date=datetime.datetime.strptime(birthday.value, "%Y-%m-%d"),
+                            document=document_id.value,
+                            phone1=phone1.value,
+                            phone2=phone2.value,
+                            instagram=instagram.value)
 
         try:
             session.add(customer)

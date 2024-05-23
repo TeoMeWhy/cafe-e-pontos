@@ -1,6 +1,7 @@
 from nicegui import APIRouter, ui
 
-from utils import validate, db, models
+from models.product import Product
+from utils import validate, db
 
 from sqlalchemy import select, exc
 
@@ -10,8 +11,8 @@ produto = APIRouter()
 @ui.page("/produto/{produto_id}")
 def product_page(produto_id: str):
 
-    product = session.scalar(select(models.Product)
-                             .where(models.Product.id==produto_id))
+    product = session.scalar(select(Product)
+                             .where(Product.id==produto_id))
 
     if not product:
         ui.navigate.to("/produto_busca?error=true")
