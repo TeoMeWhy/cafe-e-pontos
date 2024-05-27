@@ -17,8 +17,8 @@ def search_product_page(error=None):
 
     ui.markdown('# Buscar Produto')
 
-    products = session.execute(select(Product.id, Product.name)).all()
-    descriptions = [f'{i[0]:02} - {i[-1]}' for i in products]
+    products = session.scalars(select(Product)).all()
+    descriptions = [f'{i.id:02} - {i.name}' for i in products]
     description = ui.select(descriptions, with_input=True)
 
     def search():
@@ -32,3 +32,17 @@ def search_product_page(error=None):
     with ui.row():
         ui.button("Buscar!", on_click=search, color='green')
         ui.button("Início", on_click=lambda: ui.navigate.to('/'))
+
+    columns = [
+            {'name': 'id', 'label': 'Id', 'field': 'id'},
+            {'name': 'name', 'label': 'Nome', 'field': 'name'},
+            {'name': 'description', 'label': 'Descrição', 'field': 'description'},
+            {'name': 'value', 'label': 'Valor', 'field': 'value'},
+            {'name': 'points', 'label': 'Pontos', 'field': 'points'},
+    ]
+    rows = [
+            {'id': i.id, 'name': i.name, 'description': i.description, 'value': i.value, 'points': i.points}
+            for i in products[:10]
+    ]
+    
+    table=ui.table(columns=columns, rows=rows, row_key='name')

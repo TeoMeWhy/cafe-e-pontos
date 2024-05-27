@@ -26,7 +26,7 @@ ui.markdown('---')
 ui.markdown('## Compras')
 with ui.row():
     ui.button("Nova Compra", on_click=lambda: ui.navigate.to('/cadastro_transacao'))
-    ui.button("Histórico de compras", on_click=lambda: ui.notification("Pontos resgatados"))
+    ui.button("Histórico de compras", on_click=lambda: ui.notification("Essa página ainda não existe"))
 
 ui.markdown('---')
 ui.markdown('## Clientes')
