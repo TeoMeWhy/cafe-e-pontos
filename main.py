@@ -1,9 +1,10 @@
+import shutil
+import os
+
 import time
 
 import streamlit as st
 import sqlalchemy
-
-import datetime
 
 from models.models import Base
 from models import produto, cliente, transacao
@@ -27,8 +28,6 @@ st.set_page_config(
 st.title("Café e Pontos")
 
 
-
-
 def cadastrar_cliente(cpf:str):
 
     cliente_instance = utils_collects.collect_cliente_data(cpf)
@@ -42,7 +41,21 @@ def cadastrar_cliente(cpf:str):
             st.success("Cliente cadastrado com sucesso!")
             time.sleep(1)
             st.rerun()
-     
+
+
+def cadastrar_produto():
+
+    produto_instance = utils_collects.collect_produto_data(ENGINE_SESSION)
+
+    if st.button("Confirmar"):
+        if produto_instance.nome and produto_instance.descricao and produto_instance.pontos_compra:
+            produto.insert_produto(ENGINE_SESSION, produto_instance)
+            st.success("Produto cadastrado com sucesso!")
+            time.sleep(1)
+            st.rerun()
+        else:
+            st.error("Por favor, preencha todos os campos obrigatórios.")
+
 
 def expander_cliente():
 
@@ -73,20 +86,6 @@ def expander_cliente():
                 cadastrar_cliente(cpf)
 
 
-def cadastrar_produto():
-
-    produto_instance = utils_collects.collect_produto_data(ENGINE_SESSION)
-
-    if st.button("Confirmar"):
-        if produto_instance.nome and produto_instance.descricao and produto_instance.pontos_compra:
-            produto.insert_produto(ENGINE_SESSION, produto_instance)
-            st.success("Produto cadastrado com sucesso!")
-            time.sleep(1)
-            st.rerun()
-        else:
-            st.error("Por favor, preencha todos os campos obrigatórios.")
-
-
 def expander_produto():
 
     with st.expander("Produto", expanded=False):
@@ -107,8 +106,6 @@ def expander_produto():
 
         with cadastro:
             cadastrar_produto()
-
-
 
 
 def adicao_pontos(cpf_cliente):
@@ -139,6 +136,49 @@ def adicao_pontos(cpf_cliente):
         except Exception as e:
             st.error(f"Ocorreu um erro: {e}")
 
+def login():
 
-expander_cliente()
-expander_produto()
+    st.markdown("### Login")
+
+    if os.path.exists("passwords"):
+
+        with open("passwords", "r") as f:
+            passwords = f.readlines()
+
+        password = st.text_input("Senha", type="password")
+
+        if len(password) == 0:
+            return False
+
+        if password in passwords:
+            st.success("Login realizado com sucesso!")
+            time.sleep(1)
+            return True
+
+        else:
+            st.error("Senha incorreta. Tente novamente.")
+            return False
+
+    else:
+        st.text("Esse é seu primeiro acesso. Por favor, crie uma senha.")
+        new_password = st.text_input("Crie uma senha", type="password")
+
+        if st.button("Criar Senha"):
+            if new_password:
+                with open("passwords", "w") as f:
+                    f.write(new_password)
+                st.success("Senha criada com sucesso!")
+                time.sleep(1)
+                st.rerun()
+                return False
+            else:
+                st.error("Por favor, preencha a senha.")
+
+if not st.session_state.get("logged_in", False):
+    st.session_state['logged_in'] = login()
+    if st.session_state['logged_in']:
+        st.rerun()
+
+else:
+    expander_cliente()
+    expander_produto()
