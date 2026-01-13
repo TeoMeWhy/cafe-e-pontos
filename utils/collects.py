@@ -73,15 +73,18 @@ def collect_produto_input(db:Session, key=None):
 
 def collect_product_i(db:Session, product=None, i=0):
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if not product:
-            produto = collect_produto_input(db, key=f"Adicao_produto_{i}")
+    with st.container(border=True):
 
-    with col2:
-        qtde = st.number_input("Quantidade", min_value=1, value=1, key=f"qtde_produto_{i}")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if not product:
+                produto = collect_produto_input(db, key=f"Adicao_produto_{i}")
 
-    with col3:
-        st.markdown(f"**Pontos**: {qtde*produto.pontos_compra}")
+        with col2:
+            qtde = st.number_input("Quantidade", min_value=1, value=1, key=f"qtde_produto_{i}")
 
-    return produto, qtde
+        with col3:
+            st.markdown(f"######")
+            st.markdown(f"   **Pontos**: {qtde*produto.pontos_compra}")
+
+        return produto, qtde
