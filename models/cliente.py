@@ -14,6 +14,10 @@ def get_cliente_by_cpf(db: Session, cpf: str):
     return db.scalar(db.query(Cliente).filter(Cliente.cpf == cpf))
 
 
+def get_all_clientes(db: Session):
+    return db.query(Cliente).all()
+
+
 def delete_cliente_by_cpf(db: Session, cpf: str):
     cliente = get_cliente_by_cpf(db, cpf)
     if cliente:
