@@ -39,3 +39,13 @@ def show_produto(produto_data):
         st.markdown(f"**Descricao**: {produto_data.descricao}")
         st.markdown(f"**Pontos Compra**: {produto_data.pontos_compra}")
         st.markdown(f"**Pontos Resgate**: {produto_data.pontos_resgate}")
+
+def show_aniversariantes(aniversariantes):
+    if not aniversariantes:
+        st.info("Nenhum cliente faz aniversário hoje.")
+        return
+
+    st.success(f"{len(aniversariantes)} cliente(s) faz(em) aniversário hoje!")
+
+    for cliente_data in aniversariantes:
+        st.info(f"{cliente_data.nome_completo}")

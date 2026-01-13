@@ -125,6 +125,12 @@ def expander_produto():
             cadastrar_produto()
 
 
+def expander_avisos():
+    with st.expander("Avisos", expanded=False):
+        aniversariantes = cliente.get_aniversariantes(ENGINE_SESSION)
+        utils_show.show_aniversariantes(aniversariantes)
+
+
 def adicao_pontos(c):
 
     col1, *_ = st.columns([1,3])
@@ -205,3 +211,4 @@ if not st.session_state.get("logged_in", False):
 else:
     expander_cliente()
     expander_produto()
+    expander_avisos()
