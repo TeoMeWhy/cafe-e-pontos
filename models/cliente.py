@@ -16,12 +16,14 @@ def get_cliente_by_cpf(db: Session, cpf: str):
 def get_all_clientes(db: Session):
     return db.query(Cliente).all()
 
+
 def get_aniversariantes(db: Session):
     today = sqlalchemy.func.strftime("%m-%d", sqlalchemy.func.current_date())
     aniversariantes =  (db.query(Cliente)
                           .filter(sqlalchemy.func.strftime("%m-%d", Cliente.aniversario) == today)
                           .all())
     return aniversariantes
+
 
 def delete_cliente_by_cpf(db: Session, cpf: str):
     cliente = get_cliente_by_cpf(db, cpf)

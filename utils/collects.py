@@ -44,11 +44,11 @@ def collect_produto_data(db:Session):
         st.warning("Já existe um produto com esse nome. Por favor, escolha outro nome.")
 
     
-    descricao = st.text_input("Descrição")
-    preco_venda = st.number_input("Preço de Venda (R$)", min_value=0.0, format="%.2f")
-    preco_custo = st.number_input("Preço do Custo (R$)", min_value=0.0, format="%.2f")
-    pontos_compra = st.number_input("Pontos de Compra", min_value=0)
-    pontos_resgate = st.number_input("Pontos de Resgate", min_value=0)
+    descricao = st.text_input("Descrição", help="Descrição do produto")
+    preco_venda = st.number_input("Preço de Venda (R$)", min_value=0.0, format="%.2f", help="Preço pelo qual o produto será vendido")
+    preco_custo = st.number_input("Preço do Custo (R$)", min_value=0.0, format="%.2f", help="Preço que o produto custou para ser adquirido/produzido")
+    pontos_compra = st.number_input("Pontos de Compra", min_value=0, help="Quantidade de pontos que o cliente ganha ao comprar esse produto")
+    pontos_resgate = st.number_input("Pontos de Resgate", min_value=0, help="Quantidade de pontos necessários para resgatar esse produto")
 
     new_produto = models.Produto(
         nome=nome,
@@ -77,20 +77,20 @@ def collect_produto_input(db:Session, key=None):
         return produto.get_produto_by_name(db, produto_selecionado)
 
 
-def collect_product_i(db:Session, product=None, i=0):
+def collect_product_i(db:Session, product=None, i=0, tipo_transacao="compra"):
 
     with st.container(border=True):
 
         col1, col2, col3 = st.columns(3)
         with col1:
             if not product:
-                produto = collect_produto_input(db, key=f"Adicao_produto_{i}")
+                produto = collect_produto_input(db, key=f"Adicao_produto_{i}_{tipo_transacao}")
 
         with col2:
-            qtde = st.number_input("Quantidade", min_value=1, value=1, key=f"qtde_produto_{i}")
+            qtde = st.number_input("Quantidade", min_value=1, value=1, key=f"qtde_produto_{i}_{tipo_transacao}")
 
         with col3:
             st.markdown(f"######")
-            st.markdown(f"   **Pontos**: {qtde*produto.pontos_compra}")
+            st.markdown(f"   **Pontos**: {qtde*produto.pontos_compra if tipo_transacao == 'compra' else qtde*produto.pontos_resgate}")
 
         return produto, qtde

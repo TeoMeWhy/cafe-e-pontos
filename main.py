@@ -1,6 +1,3 @@
-import shutil
-import os
-
 import time
 
 import streamlit as st
@@ -12,7 +9,9 @@ from models.models import Cliente, Produto
 
 from utils import show as utils_show
 from utils import collects as utils_collects
+from utils import pontos
 
+from utils.login import login
 
 DATABASE_URL = "sqlite:///data/database.db"
 engine = sqlalchemy.create_engine(DATABASE_URL)
@@ -72,10 +71,12 @@ def expander_cliente():
 
                 col1, _, col3 = st.columns(3)
 
-                add_pontos = col1.toggle("Adicionar Pontos")
-                if add_pontos:
-                    adicao_pontos(c)
-                
+                if col1.toggle("Adicionar Pontos"):
+                    pontos.adicao_pontos(ENGINE_SESSION, c)
+
+                if col1.toggle("Resgatar Pontos"):
+                    pontos.resgate_pontos(ENGINE_SESSION, c)
+
                 if col3.button("Excluir Cliente"):
                     if cliente.delete_cliente_by_cpf(ENGINE_SESSION, c.cpf):
                         st.success("Cliente excluído com sucesso!")
@@ -131,77 +132,6 @@ def expander_avisos():
         utils_show.show_aniversariantes(aniversariantes)
 
 
-def adicao_pontos(c):
-
-    col1, *_ = st.columns([1,3])
-    with col1:
-        add_buttom = st.number_input("Adicionar Produtos", min_value=1, value=1)
-        
-    produtos = []
-    for i in range(add_buttom):
-        produtos.append(utils_collects.collect_product_i(ENGINE_SESSION,i=i))
-
-
-    _, col2 = st.columns([2,1])
-    with col2:
-        with st.container(border=True):
-            total = sum([i[0].pontos_compra * i[1] for i in produtos])
-            st.markdown(f"**Total**: {total}")
-
-    confirma_add = st.button("Confirmar Adição de Pontos")
-    if confirma_add:
-
-        try:
-            c = cliente.get_cliente_by_cpf(ENGINE_SESSION, c.cpf)
-            valor_pontos = transacao.create_trasacao(ENGINE_SESSION, c.id, produtos)
-            c.pontos += valor_pontos
-            cliente.update_cliente(ENGINE_SESSION, c)
-            st.success("Pontos adicionados com sucesso!")
-            c = cliente.get_cliente_by_cpf(ENGINE_SESSION, c.cpf)
-            time.sleep(1)
-            st.rerun()
-            adicao_pontos(c)
-
-        except Exception as e:
-            st.error(f"Ocorreu um erro: {e}")
-
-def login():
-
-    st.markdown("### Login")
-
-    if os.path.exists("passwords"):
-
-        with open("passwords", "r") as f:
-            passwords = f.readlines()
-
-        password = st.text_input("Senha", type="password")
-
-        if len(password) == 0:
-            return False
-
-        if password in passwords:
-            st.success("Login realizado com sucesso!")
-            time.sleep(1)
-            return True
-
-        else:
-            st.error("Senha incorreta. Tente novamente.")
-            return False
-
-    else:
-        st.text("Esse é seu primeiro acesso. Por favor, crie uma senha.")
-        new_password = st.text_input("Crie uma senha", type="password")
-
-        if st.button("Criar Senha"):
-            if new_password:
-                with open("passwords", "w") as f:
-                    f.write(new_password)
-                st.success("Senha criada com sucesso!")
-                time.sleep(1)
-                st.rerun()
-                return False
-            else:
-                st.error("Por favor, preencha a senha.")
 
 if not st.session_state.get("logged_in", False):
     st.session_state['logged_in'] = login()
