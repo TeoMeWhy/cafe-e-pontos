@@ -6,16 +6,22 @@ from sqlalchemy.orm import Session
 from models import models, produto, cliente
 
 
-def collect_cliente_data(cpf: str):
+def collect_cliente_data(c: models.Cliente = models.Cliente()) -> models.Cliente:
     
+    cpf = st.text_input("CPF do Cliente:", value=c.cpf, disabled=c.cpf != "")
     min_date = datetime.datetime.now() - datetime.timedelta(days=365*100)
     max_date = datetime.datetime.now() - datetime.timedelta(days=365*18) + datetime.timedelta(days=1)
 
-    nome_completo = st.text_input("Nome Completo")
-    email = st.text_input("Email")
-    aniversario = st.date_input("Aniversário", format="DD/MM/YYYY", min_value=min_date, max_value=max_date, help="Data de nascimento do cliente")
-    telefone = st.text_input("Telefone")
-    instagram = st.text_input("Instagram")
+    nome_completo = st.text_input("Nome Completo", value=c.nome_completo)
+    email = st.text_input("Email", value=c.email)
+    aniversario = st.date_input("Aniversário",
+                                value=c.aniversario,
+                                format="DD/MM/YYYY",
+                                min_value=min_date,
+                                max_value=max_date,
+                                help="Data de nascimento do cliente")
+    telefone = st.text_input("Telefone", value=c.telefone)
+    instagram = st.text_input("Instagram", value=c.instagram)
 
     cliente = models.Cliente(
         cpf=cpf,

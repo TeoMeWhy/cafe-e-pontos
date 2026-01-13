@@ -31,15 +31,14 @@ st.title("Café e Pontos")
 
 def cadastrar_cliente():
 
-    cpf = st.text_input("CPF do Cliente:")
-    cliente_instance = utils_collects.collect_cliente_data(cpf)
-
+    c = utils_collects.collect_cliente_data()
     if st.button("Cadastrar Cliente"):
-        if cliente_instance.nome_completo == "":
+        
+        if c.nome_completo == "":
             st.error("Por favor, preencha o nome completo.")
 
         else:
-            cliente.insert_cliente(ENGINE_SESSION, cliente_instance)
+            cliente.insert_cliente(ENGINE_SESSION, c)
             st.success("Cliente cadastrado com sucesso!")
             time.sleep(1)
             st.rerun()
@@ -62,26 +61,43 @@ def expander_cliente():
     with st.expander("Cliente", expanded=False):
 
         novo_cadastro = Cliente(cpf="", nome_completo="Novo Cadastro")
-        cliente_instance = st.selectbox("Procure ou cadastre um cliente pelo CPF:", [novo_cadastro]+clientes_list, format_func=lambda c: f"{c.nome_completo} - {c.cpf}")
+        c = st.selectbox("Procure ou cadastre um cliente pelo CPF:", [novo_cadastro]+clientes_list, format_func=lambda c: f"{c.nome_completo} - {c.cpf}")
         
-        if cliente_instance.nome_completo != "Novo Cadastro":
-            utils_show.show_cliente(cliente_instance)
+        if c.nome_completo != "Novo Cadastro":
+            
+            tab_info, tab_edit = st.tabs(["Informações", "Editar"])
 
-            col1, _, col2 = st.columns(3)
-            with col1:
-                add_pontos = st.toggle("Adicionar Pontos")
-            
-            if add_pontos:
-                adicao_pontos(cliente_instance)
-            
-            with col2:
-                if st.button("Excluir Cliente"):
-                    if cliente.delete_cliente_by_cpf(ENGINE_SESSION, cliente_instance.cpf):
+            with tab_info:
+                utils_show.show_cliente(c)
+
+                col1, _, col3 = st.columns(3)
+
+                add_pontos = col1.toggle("Adicionar Pontos")
+                if add_pontos:
+                    adicao_pontos(c)
+                
+                if col3.button("Excluir Cliente"):
+                    if cliente.delete_cliente_by_cpf(ENGINE_SESSION, c.cpf):
                         st.success("Cliente excluído com sucesso!")
                         time.sleep(1)
                         st.rerun()
                     else:
                         st.error("Erro ao excluir o cliente.")
+
+            with tab_edit:
+                    c_new = utils_collects.collect_cliente_data(c)
+                    c_new.id = cliente.get_cliente_by_cpf(ENGINE_SESSION, c_new.cpf).id
+                    if st.button("Salvar"):
+                        
+                        if c_new.nome_completo == "":
+                            st.error("Por favor, preencha o nome completo.")
+
+                        else:
+                            cliente.update_cliente(ENGINE_SESSION, c_new)
+                            st.success("Cliente atualizado com sucesso!")
+                            c = cliente.get_cliente_by_cpf(ENGINE_SESSION, c_new.cpf)
+                            time.sleep(3)
+                            st.rerun()
 
         else:
             cadastrar_cliente()

@@ -8,7 +8,7 @@ def show_cliente(cliente_data):
 
     with col1:
         st.markdown(f"**CPF**: {cliente_data.cpf}")
-        st.markdown(f"**Aniversário**: {cliente_data.aniversario}")
+        st.markdown(f"**Aniversário**: {cliente_data.aniversario.strftime('%d/%m/%Y')}")
         st.markdown(f"**Pontos**: {cliente_data.pontos}")
     
     with col2:
