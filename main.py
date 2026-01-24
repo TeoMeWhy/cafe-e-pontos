@@ -138,6 +138,7 @@ if not st.session_state.get("logged_in", False):
     if st.session_state['logged_in']:
         st.rerun()
 
+
 else:
     expander_cliente()
     expander_produto()
