@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 from models import models, produto, cliente
 
 
-def collect_cliente_data(c: models.Cliente = models.Cliente()) -> models.Cliente:
+def collect_cliente_data(c: models.Cliente = models.Cliente(), edit_cpf=False) -> models.Cliente:
     
-    cpf = st.text_input("CPF do Cliente:", value=c.cpf, disabled=c.cpf != "")
+    cpf = st.text_input("CPF do Cliente:", value=c.cpf, disabled=not edit_cpf)
     min_date = datetime.datetime.now() - datetime.timedelta(days=365*100)
     max_date = datetime.datetime.now() - datetime.timedelta(days=365*18) + datetime.timedelta(days=1)
 

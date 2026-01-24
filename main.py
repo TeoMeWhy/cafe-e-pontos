@@ -30,7 +30,7 @@ st.title("Café e Pontos")
 
 def cadastrar_cliente():
 
-    c = utils_collects.collect_cliente_data()
+    c = utils_collects.collect_cliente_data(edit_cpf=True)
     if st.button("Cadastrar Cliente"):
         
         if c.nome_completo == "":
@@ -86,7 +86,7 @@ def expander_cliente():
                         st.error("Erro ao excluir o cliente.")
 
             with tab_edit:
-                    c_new = utils_collects.collect_cliente_data(c)
+                    c_new = utils_collects.collect_cliente_data(c, edit_cpf=False)
                     c_new.id = cliente.get_cliente_by_cpf(ENGINE_SESSION, c_new.cpf).id
                     if st.button("Salvar"):
                         
